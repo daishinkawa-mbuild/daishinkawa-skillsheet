@@ -1,0 +1,10 @@
+.DS_Store
+.idea/
+node_modules/
+pnpm-debug.log*
+
+apps/docs/.next/
+apps/docs/node_modules/
+apps/docs/pages/_meta.json
+apps/docs/pages/index.mdx
+apps/docs/pages/docs/

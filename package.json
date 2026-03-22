@@ -1,0 +1,13 @@
+{
+  "name": "daishinkawa-skillsheet",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "docs:sync": "pnpm --filter @daishinkawa-skillsheet/docs sync-docs",
+    "docs:dev": "pnpm --filter @daishinkawa-skillsheet/docs dev",
+    "docs:build": "pnpm --filter @daishinkawa-skillsheet/docs build",
+    "docs:start": "pnpm --filter @daishinkawa-skillsheet/docs start"
+  }
+}
