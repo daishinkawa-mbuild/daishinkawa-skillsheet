@@ -1,5 +1,7 @@
 .DS_Store
 .idea/
+__pycache__/
+*.pyc
 node_modules/
 pnpm-debug.log*
 
@@ -8,3 +10,7 @@ apps/docs/node_modules/
 apps/docs/pages/_meta.json
 apps/docs/pages/index.mdx
 apps/docs/pages/docs/
+apps/docs/pages/projects/
+
+output
+tmp

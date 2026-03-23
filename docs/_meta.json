@@ -1,4 +1,8 @@
 {
-  "skill_summary": "スキルシート概要",
-  "projects": "案件別詳細"
+  "index": {
+    "title": "スキルシート概要"
+  },
+  "projects": {
+    "title": "案件別詳細"
+  }
 }

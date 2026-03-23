@@ -7,11 +7,8 @@ const __dirname = path.dirname(__filename);
 
 const sourceDir = path.resolve(__dirname, "../../../docs");
 const pagesDir = path.resolve(__dirname, "../pages");
-const docsTargetDir = path.resolve(pagesDir, "docs");
 const sourceHomeCandidates = ["index.mdx", "index.md"];
 const targetHomeFileName = "index.mdx";
-const docsSectionLabel = "Docs";
-const homePageLabel = "Home";
 const pollIntervalMs = 500;
 const watchDebounceMs = 120;
 
@@ -112,18 +109,8 @@ async function createDirectoryMeta(dirPath) {
 }
 
 /**
- * docs ルートを `pages/docs` へ丸ごと複製する。
- * コンテンツの正本を `docs/` に固定し、配信用ディレクトリは毎回生成し直す。
- */
-async function syncDocsDirectory(sourcePath, targetPath) {
-  await rm(targetPath, { recursive: true, force: true });
-  await mkdir(path.dirname(targetPath), { recursive: true });
-  await cp(sourcePath, targetPath, { recursive: true });
-}
-
-/**
  * docs ルートの index をサイトトップページへ複製する。
- * `/docs` と `/` の両方から同じ導入ページへ辿れるようにして、初期導線を揃える。
+ * スキルシート概要をルート直下へ置き、サイドバーの先頭項目として見せる。
  */
 async function syncHomePage(sourcePath, targetPath) {
   const sourceHomeFileName = await resolveSourceHomeFileName(sourcePath);
@@ -132,16 +119,39 @@ async function syncHomePage(sourcePath, targetPath) {
 }
 
 /**
- * サイトの最上位ナビゲーションを生成する。
- * ルートは Home と Docs だけに絞り、ドキュメント本文の構造は `pages/docs` 側へ委ねる。
+ * docs ルート直下の子要素を `pages/` 直下へ同期する。
+ * `index.*` はトップページへ個別同期するため除外し、それ以外だけをルート階層として並べる。
+ */
+async function syncRootEntries(sourcePath, targetPath) {
+  const sourceHomeFileName = await resolveSourceHomeFileName(sourcePath);
+  const entries = await readdir(sourcePath, { withFileTypes: true });
+
+  // 旧構成の `/docs` 配下が残るとサイドバーに重複階層が出るため、毎回掃除する。
+  await rm(path.resolve(targetPath, "docs"), { recursive: true, force: true });
+
+  for (const entry of entries) {
+    if (
+      shouldIgnoreEntry(entry.name) ||
+      entry.name === "_meta.json" ||
+      entry.name === sourceHomeFileName
+    ) {
+      continue;
+    }
+
+    const sourceEntryPath = path.resolve(sourcePath, entry.name);
+    const targetEntryPath = path.resolve(targetPath, entry.name);
+
+    await rm(targetEntryPath, { recursive: true, force: true });
+    await cp(sourceEntryPath, targetEntryPath, { recursive: true });
+  }
+}
+
+/**
+ * サイトのルート階層を docs ソースの構造に合わせて生成する。
+ * これにより、サイドバーが「スキルシート概要」「案件別詳細」の並びで表示される。
  */
 async function syncPagesRootMeta(sourcePath) {
-  const sourceMeta = await createDirectoryMeta(sourcePath);
-
-  await writeJsonFile(path.resolve(pagesDir, "_meta.json"), {
-    index: homePageLabel,
-    docs: sourceMeta.index ?? docsSectionLabel
-  });
+  await writeJsonFile(path.resolve(pagesDir, "_meta.json"), await createDirectoryMeta(sourcePath));
 }
 
 /**
@@ -172,8 +182,8 @@ async function syncDirectoryMetaRecursively(sourcePath, targetPath) {
 export async function syncDocsTree() {
   await assertSourceDirectoryExists(sourceDir);
   await mkdir(pagesDir, { recursive: true });
-  await syncDocsDirectory(sourceDir, docsTargetDir);
-  await syncDirectoryMetaRecursively(sourceDir, docsTargetDir);
+  await syncRootEntries(sourceDir, pagesDir);
+  await syncDirectoryMetaRecursively(sourceDir, pagesDir);
   await syncHomePage(sourceDir, pagesDir);
   await syncPagesRootMeta(sourceDir);
 

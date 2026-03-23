@@ -5,6 +5,8 @@
     "apps/*"
   ],
   "scripts": {
+    "dev": "pnpm docs:dev",
+    "genpdf": "python3 scripts/run_genpdf.py",
     "docs:sync": "pnpm --filter @daishinkawa-skillsheet/docs sync-docs",
     "docs:dev": "pnpm --filter @daishinkawa-skillsheet/docs dev",
     "docs:build": "pnpm --filter @daishinkawa-skillsheet/docs build",
