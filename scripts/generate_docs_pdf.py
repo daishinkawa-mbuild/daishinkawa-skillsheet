@@ -30,6 +30,7 @@ from reportlab.platypus import (
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DOCS_DIR = ROOT_DIR / "docs"
 OUTPUT_PDF = ROOT_DIR / "output" / "pdf" / "docs.pdf"
+DOCUMENT_TITLE = "技術者経歴書 - D.S"
 LATIN_SERIF_FONT = "Times-Roman"
 LATIN_SANS_FONT = "Helvetica"
 LATIN_SANS_BOLD_FONT = "Helvetica-Bold"
@@ -505,7 +506,7 @@ def build_pdf(markdown_paths: list[Path], output_path: Path) -> None:
         rightMargin=18 * mm,
         topMargin=16 * mm,
         bottomMargin=16 * mm,
-        title="技術者経歴書",
+        title=DOCUMENT_TITLE,
         author="Codex",
     )
 
